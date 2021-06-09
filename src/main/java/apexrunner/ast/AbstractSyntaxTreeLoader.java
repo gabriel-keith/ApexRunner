@@ -1,6 +1,7 @@
 package apexrunner.ast;
 
 import apexrunner.parser.ApexParser;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
@@ -10,22 +11,15 @@ public class AbstractSyntaxTreeLoader {
         ApexClass apexClass = new ApexClass();
 
         if (modifiers != null) {
-            for (var mod : modifiers) {
-                if (mod.ABSTRACT() != null) {
-                    apexClass.abstraction = ApexAbstraction.ABSTRACT;
-                }
-                if (mod.VIRTUAL() != null) {
-                    apexClass.abstraction = ApexAbstraction.VIRTUAL;
-                }
-
-                if (mod.PRIVATE() != null) {
-                    apexClass.accessModifier = ApexAccessModifier.PROTECTED;
-                }
-                if (mod.PROTECTED() != null) {
-                    apexClass.accessModifier = ApexAccessModifier.PROTECTED;
-                }
-                if (mod.GLOBAL() != null) {
-                    apexClass.accessModifier = ApexAccessModifier.GLOBAL;
+            for (var modifier : modifiers) {
+                if (modifier.getChildCount() == 1 && modifier.getChild(0) instanceof TerminalNode terminal) {
+                    switch (terminal.getSymbol().getType()) {
+                        case ApexParser.ABSTRACT -> apexClass.abstraction = ApexAbstraction.ABSTRACT;
+                        case ApexParser.VIRTUAL -> apexClass.abstraction = ApexAbstraction.VIRTUAL;
+                        case ApexParser.PRIVATE -> apexClass.accessModifier = ApexAccessModifier.PRIVATE;
+                        case ApexParser.PROTECTED -> apexClass.accessModifier = ApexAccessModifier.PROTECTED;
+                        case ApexParser.GLOBAL -> apexClass.accessModifier = ApexAccessModifier.GLOBAL;
+                    }
                 }
             }
         }
@@ -65,32 +59,18 @@ public class AbstractSyntaxTreeLoader {
 
         if (modifiers != null) {
             for (var topMod : modifiers) {
-                var mod = topMod.classOrInterfaceModifier();
-                if (mod.ABSTRACT() != null) {
-                    //Fields can't be abstract
-                    //apexField.isAbstract = true;
-                }
-                if (mod.VIRTUAL() != null) {
-                    apexField.abstraction = ApexAbstraction.VIRTUAL;
-                }
-                if (mod.FINAL() != null) {
-                    apexField.isFinal = true;
-                }
-                if (mod.STATIC() != null) {
-                    apexField.isStatic = true;
-                }
+                ApexParser.ClassOrInterfaceModifierContext modifier = topMod.classOrInterfaceModifier();
 
-                if (mod.PUBLIC() != null) {
-                    apexField.accessModifier = ApexAccessModifier.PUBLIC;
+                if (modifier.getChildCount() == 1 && modifier.getChild(0) instanceof TerminalNode terminal) {
+                    switch (terminal.getSymbol().getType()) {
+                        case ApexParser.VIRTUAL -> apexField.abstraction = ApexAbstraction.VIRTUAL;
+                        case ApexParser.PUBLIC -> apexField.accessModifier = ApexAccessModifier.PUBLIC;
+                        case ApexParser.PROTECTED -> apexField.accessModifier = ApexAccessModifier.PROTECTED;
+                        case ApexParser.GLOBAL -> apexField.accessModifier = ApexAccessModifier.GLOBAL;
+                        case ApexParser.FINAL -> apexField.isFinal = true;
+                        case ApexParser.STATIC -> apexField.isStatic = true;
+                    }
                 }
-                if (mod.PROTECTED() != null) {
-                    apexField.accessModifier = ApexAccessModifier.PROTECTED;
-                }
-                if (mod.GLOBAL() != null) {
-                    apexField.accessModifier = ApexAccessModifier.GLOBAL;
-                }
-
-
             }
         }
 
@@ -108,16 +88,15 @@ public class AbstractSyntaxTreeLoader {
         if (expressionContext.primary() != null && expressionContext.primary().literal() != null) {
             var literal = expressionContext.primary().literal();
 
-            if (literal.BooleanLiteral() != null) {
-                return new ApexExpression.ApexBooleanLiteral(Boolean.parseBoolean(literal.getText()));
-            } else if (literal.StringLiteral() != null) {
-                return new ApexExpression.ApexStringLiteral(literal.getText().substring(1, literal.getText().length() - 1));
-            } else if (literal.FloatingPointLiteral() != null) {
-                return new ApexExpression.ApexFloatLiteral(literal.getText());
-            } else if (literal.IntegerLiteral() != null) {
-                return new ApexExpression.ApexIntLiteral(Integer.parseInt(literal.getText()));
-            } else if (literal.NullLiteral() != null) {
-                return new ApexExpression.ApexNullLiteral();
+            if (literal.getChildCount() == 1 && literal.getChild(0) instanceof TerminalNode terminal) {
+                return switch (terminal.getSymbol().getType()) {
+                    case ApexParser.BooleanLiteral -> new ApexExpression.ApexBooleanLiteral(Boolean.parseBoolean(terminal.getText()));
+                    case ApexParser.FloatingPointLiteral -> new ApexExpression.ApexFloatLiteral(literal.getText());
+                    case ApexParser.IntegerLiteral -> new ApexExpression.ApexIntLiteral(Integer.parseInt(literal.getText()));
+                    case ApexParser.NullLiteral -> new ApexExpression.ApexNullLiteral();
+
+                    default -> throw new IllegalStateException("Unknown literal");
+                };
             }
         }
 
