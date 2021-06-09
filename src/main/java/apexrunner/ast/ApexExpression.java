@@ -6,9 +6,10 @@ import java.util.List;
 public class ApexExpression {
 
 
-    public static class ApexClassInitExpersion extends ApexExpression {
+    public static class ApexClassInitExpression extends ApexExpression {
         public String typeIdentifier;
-        public List<String> generics = new ArrayList<>();
+        public List<String> generics = new ArrayList<>(); // only applies to a small number of types
+        public List<ApexExpression> arguments = new ArrayList<>();
     }
 
     public static class ApexLiteral extends ApexExpression {
