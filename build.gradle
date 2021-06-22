@@ -1,8 +1,9 @@
 plugins {
     id 'java'
+    id 'antlr'
 }
 
-group 'org.example'
+group 'apexrunner'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -12,7 +13,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-    implementation 'org.antlr:antlr4:4.9.2'
+    antlr 'org.antlr:antlr4:4.9.2'
 }
 
 test {
@@ -29,4 +30,10 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+generateGrammarSource {
+    arguments += ['-package', 'apexrunner.antlr', '-visitor']
+
+    outputDirectory = buildDir.toPath().resolve("./generated-src/antlr/main/apexrunner/antlr").toFile()
 }

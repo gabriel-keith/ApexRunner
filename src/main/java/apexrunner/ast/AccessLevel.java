@@ -1,6 +1,6 @@
 package apexrunner.ast;
 
-public enum ApexAccessModifier {
+public enum AccessLevel {
     PUBLIC,
     GLOBAL,
     PRIVATE,

@@ -1,5 +1,5 @@
 package apexrunner.ast;
 
-public enum ApexAbstraction {
+public enum AbstractionLevel {
     FINAL, VIRTUAL, ABSTRACT
 }

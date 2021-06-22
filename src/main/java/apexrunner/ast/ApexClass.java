@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApexClass {
-    public ApexAccessModifier accessModifier = ApexAccessModifier.PUBLIC;
-    public ApexAbstraction abstraction = ApexAbstraction.FINAL;
+    public AccessLevel accessModifier = AccessLevel.PRIVATE;
+    public AbstractionLevel abstraction = AbstractionLevel.FINAL;
 
     public String identifier;
 

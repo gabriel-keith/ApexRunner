@@ -1,5 +1,7 @@
 package apexrunner.ast;
 
+import apexrunner.ast.expression.literal.*;
+
 public class JavaClassGenerator {
 
 
@@ -32,7 +34,7 @@ public class JavaClassGenerator {
             builder.append(" ");
             builder.append(field.identifier);
 
-            if (field.initializer instanceof ApexExpression.ApexLiteral literal) {
+            if (field.initializer instanceof Literal literal) {
                 builder.append(" = ");
                 builder.append(literal(literal));
             }
@@ -45,7 +47,7 @@ public class JavaClassGenerator {
         return builder;
     }
 
-    private static String accessModifier(ApexAccessModifier modifier) {
+    private static String accessModifier(AccessLevel modifier) {
         return switch (modifier) {
             case PUBLIC, GLOBAL -> "public ";
             case PRIVATE -> "private ";
@@ -53,7 +55,7 @@ public class JavaClassGenerator {
         };
     }
 
-    private static String abstraction(ApexAbstraction abstraction) {
+    private static String abstraction(AbstractionLevel abstraction) {
         return switch (abstraction) {
             case FINAL -> "final ";
             case ABSTRACT -> "abstract ";
@@ -61,31 +63,32 @@ public class JavaClassGenerator {
         };
     }
 
-    private static String type(String typeIdentifier) {
-        return switch (typeIdentifier) {
-            case "Integer" -> "int";
-            case "Float" -> "float";
-            case "Double" -> "double";
-            case "Boolean" -> "boolean";
-            default -> typeIdentifier;
+    private static String type(TypeIdentifier typeIdentifier) {
+        return switch (typeIdentifier.getName()) {
+            case "id", "string" -> "String";
+            case "integer" -> "int";
+            case "long" -> "long";
+            case "float" -> "double";
+            case "boolean" -> "boolean";
+
+            case "list" -> "ArrayList";
+            default -> typeIdentifier.getName();
         };
     }
 
-    private static String literal(ApexExpression.ApexLiteral literal) {
-        if (literal instanceof ApexExpression.ApexStringLiteral stringLiteral) {
-            return "\"" + stringLiteral.value + "\"";
-        }
-        if (literal instanceof ApexExpression.ApexIntLiteral intLiteral) {
-            return String.valueOf(intLiteral.value);
-        }
-        if (literal instanceof ApexExpression.ApexFloatLiteral floatLiteral) {
-            return floatLiteral.value;
-        }
-        if (literal instanceof ApexExpression.ApexNullLiteral) {
+    private static String literal(Literal literal) {
+        if (literal instanceof StringLiteral stringLiteral) {
+            return "\"" + stringLiteral.getValue() + "\"";
+        } else if (literal instanceof IntegerLiteral intLiteral) {
+            return String.valueOf(intLiteral.getValue());
+        } else if (literal instanceof LongLiteral longLiteral) {
+            return String.valueOf(longLiteral.getValue()) + 'L';
+        } else if (literal instanceof DoubleLiteral floatLiteral) {
+            return String.valueOf(floatLiteral.getValue());
+        } else if (literal instanceof NullLiteral) {
             return "null";
-        }
-        if (literal instanceof ApexExpression.ApexBooleanLiteral booleanLiteral) {
-            return String.valueOf(booleanLiteral.value);
+        } else if (literal instanceof BooleanLiteral booleanLiteral) {
+            return String.valueOf(booleanLiteral.getValue());
         }
 
         return "";

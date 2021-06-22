@@ -1,13 +1,15 @@
 package apexrunner.ast;
 
+import apexrunner.ast.expression.Expression;
+
 public class ApexField {
-    public ApexAccessModifier accessModifier = ApexAccessModifier.PRIVATE;
-    public ApexAbstraction abstraction = ApexAbstraction.FINAL;
+    public AccessLevel accessModifier = AccessLevel.PRIVATE;
+    public AbstractionLevel abstraction = AbstractionLevel.FINAL;
     public boolean isFinal;
     public boolean isStatic;
 
     public String identifier;
-    public String typeIdentifier;
+    public TypeIdentifier typeIdentifier;
 
-    public ApexExpression initializer;
+    public Expression initializer;
 }
