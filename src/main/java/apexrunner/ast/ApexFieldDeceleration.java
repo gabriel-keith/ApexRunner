@@ -2,9 +2,8 @@ package apexrunner.ast;
 
 import apexrunner.ast.expression.Expression;
 
-public class ApexField {
-    public AccessLevel accessModifier = AccessLevel.PRIVATE;
-    public AbstractionLevel abstraction = AbstractionLevel.FINAL;
+public class ApexFieldDeceleration {
+    private Modifiers modifiers;
     public boolean isFinal;
     public boolean isStatic;
 
